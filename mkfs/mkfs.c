@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <assert.h>
 
+#include "posix_legacy.h"
+
 #define stat xv6_stat  // avoid clash with host struct stat
 #include "kernel/types.h"
 #include "kernel/fs.h"
@@ -56,7 +58,7 @@ xshort(ushort x)
 uint
 xint(uint x)
 {
-  uint y;
+  static uint y;
   uchar *a = (uchar*)&y;
   a[0] = x;
   a[1] = x >> 8;
@@ -136,7 +138,8 @@ main(int argc, char *argv[])
       shortname = argv[i];
     
     assert(index(shortname, '/') == 0);
-
+    
+    printf("opening %s\n", argv[i]);
     if((fd = open(argv[i], 0)) < 0)
       die(argv[i]);
 
@@ -154,9 +157,11 @@ main(int argc, char *argv[])
     strncpy(de.name, shortname, DIRSIZ);
     iappend(rootino, &de, sizeof(de));
 
+    printf("reading...\n");
     while((cc = read(fd, buf, sizeof(buf))) > 0)
       iappend(inum, buf, cc);
-
+    
+    printf("closing\n");
     close(fd);
   }
 
@@ -261,7 +266,7 @@ iappend(uint inum, void *xp, int n)
 
   rinode(inum, &din);
   off = xint(din.size);
-  // printf("append inum %d at off %d sz %d\n", inum, off, n);
+  printf("append inum %d at off %d sz %d\n", inum, off, n);
   while(n > 0){
     fbn = off / BSIZE;
     assert(fbn < MAXFILE);

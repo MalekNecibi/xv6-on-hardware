@@ -50,6 +50,15 @@ endif
 
 QEMU = qemu-system-riscv64
 
+ifndef RENODE
+RENODE = renode
+endif
+
+ifndef RESC
+RESC = virt64.resc
+endif
+
+
 CC = $(TOOLPREFIX)gcc
 AS = $(TOOLPREFIX)gas
 LD = $(TOOLPREFIX)ld
@@ -107,7 +116,7 @@ $U/_forktest: $U/forktest.o $(ULIB)
 	$(OBJDUMP) -S $U/_forktest > $U/forktest.asm
 
 mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
-	gcc -Werror -Wall -I. -o mkfs/mkfs mkfs/mkfs.c
+	gcc -Werror -Wall -O0 -ggdb3 -I. -o mkfs/mkfs mkfs/mkfs.c
 
 # Prevent deletion of intermediate files, e.g. cat.o, after first build, so
 # that disk image changes after first build are persistent until clean.  More
@@ -134,7 +143,8 @@ UPROGS=\
 	$U/_zombie\
 
 fs.img: mkfs/mkfs README $(UPROGS)
-	mkfs/mkfs fs.img README $(UPROGS)
+	#mkfs/mkfs fs.img README $(UPROGS)
+	cp _fs.img fs.img
 
 -include kernel/*.d user/*.d
 
@@ -156,19 +166,27 @@ ifndef CPUS
 CPUS := 5
 endif
 
-QEMUOPTS = -machine sifive_u,msel=11 -bios none -kernel $K/kernel -m 8G -smp 5
+QEMUOPTS = -machine virtio -bios none -kernel $K/kernel
 QEMUOPTS += -drive file=fs.img,if=sd
 
-qemu: $K/kernel fs.img
-	$(QEMU) $(QEMUOPTS)
-
-renode: $K/kernel fs.img .gdbinit
-	renode --console virt64.resc
+RENODEOPTS = --console
 
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
+
+gdb_$(RESC): virt64.resc
+	sed 's/#machine StartGdbServer [[:digit:]]\+/machine StartGdbServer $(GDBPORT)/' < $^ > $@
+
+qemu: $K/kernel fs.img
+	$(QEMU) $(QEMUOPTS)
 
 qemu-gdb: $K/kernel .gdbinit fs.img
 	@echo "*** Now run 'gdb' in another window." 1>&2
 	$(QEMU) $(QEMUOPTS) -S $(QEMUGDB)
 
+renode: $K/kernel fs.img .gdbinit
+	$(RENODE) $(RENODEOPTS) $(RESC)
+
+renode-gdb: $K/kernel .gdbinit gdb_$(RESC) fs.img
+	@echo "*** Now run 'gdb' in another window." 1>&2
+	$(RENODE) $(RENODEOPTS) gdb_$(RESC)

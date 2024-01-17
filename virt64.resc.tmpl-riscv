@@ -4,7 +4,7 @@ using sysbus
 $name?="virt"
 mach create $name
 machine LoadPlatformDescription @riscv64_virt.repl
-#machine StartGdbServer 26000 true
+machine StartGdbServer 26000 true
 
 $bin?=@kernel/kernel
 
