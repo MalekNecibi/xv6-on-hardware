@@ -169,12 +169,12 @@ endif
 QEMUOPTS = -machine virtio -bios none -kernel $K/kernel
 QEMUOPTS += -drive file=fs.img,if=sd
 
-RENODEOPTS = --console
+#RENODEOPTS = --console
 
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
 
-gdb_$(RESC): virt64.resc
+gdb_$(RESC): $(RESC)
 	sed 's/#machine StartGdbServer [[:digit:]]\+/machine StartGdbServer $(GDBPORT)/' < $^ > $@
 
 qemu: $K/kernel fs.img

@@ -15,3 +15,9 @@ mkfs
 kernel/kernel
 user/usys.S
 .gdbinit
+gdb_virt64.resc
+
+# Ignore vim files:
+*~
+*.swp
+*.swo
