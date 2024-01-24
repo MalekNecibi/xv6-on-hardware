@@ -4,22 +4,28 @@ using sysbus
 $name?="virt"
 mach create $name
 machine LoadPlatformDescription @riscv64_virt.repl
+#machine EnableProfiler '../../msys64/home/Malek/git/xv6-on-hardware/profiler'
 #machine StartGdbServer 26000 true
-virtio LoadImage @fs.img
 
 $bin?=@kernel/kernel
 
+#logFile @log_file
+
 showAnalyzer sysbus.uart0
-#sysbus LogAllPeripheralsAccess true
-logLevel -1 sysbus.uart0
-logLevel -1 sysbus.virtio
+# sysbus.cpu LogFunctionNames true
+sysbus LogAllPeripheralsAccess true
+#logLevel -1 file sysbus.uart0
+#logLevel -1 file sysbus.virtio
+#logLevel -1 file sysbus.cpu
+#logLevel -1 file sysbus
+#logLevel -1 file cpu
 
 macro reset 
 """
-    sysbus LoadELF $bin false
+    sysbus LoadELF $bin
+    virtio LoadImage @fs.img
     cpu PC 0x80000000
-    start
+#    start
 """
 logLevel 3
-logFile @log_file
 runMacro $reset

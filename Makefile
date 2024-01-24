@@ -65,7 +65,7 @@ LD = $(TOOLPREFIX)ld
 OBJCOPY = $(TOOLPREFIX)objcopy
 OBJDUMP = $(TOOLPREFIX)objdump
 
-CFLAGS = -Wall -Werror -Og -fno-omit-frame-pointer -ggdb3 -gdwarf-2
+CFLAGS = -Wall -Werror -O0 -fno-omit-frame-pointer -ggdb3 -gdwarf-2
 CFLAGS += -MD
 CFLAGS += -mcmodel=medany
 CFLAGS += -ffreestanding -fno-common -nostdlib -mno-relax
@@ -169,7 +169,8 @@ endif
 QEMUOPTS = -machine virtio -bios none -kernel $K/kernel
 QEMUOPTS += -drive file=fs.img,if=sd
 
-#RENODEOPTS = --console
+RENODEOPTS += --console
+#RENODEOPTS += --hide-log
 
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@

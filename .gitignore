@@ -16,8 +16,12 @@ kernel/kernel
 user/usys.S
 .gdbinit
 gdb_virt64.resc
+.gdb_history
+log_file
 
 # Ignore vim files:
 *~
 *.swp
 *.swo
+
+
