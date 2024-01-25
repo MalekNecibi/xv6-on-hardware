@@ -27,5 +27,5 @@ macro reset
     cpu PC 0x80000000
 #    start
 """
-logLevel 3
+logLevel 2
 runMacro $reset
