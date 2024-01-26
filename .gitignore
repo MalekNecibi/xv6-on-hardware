@@ -1,4 +1,4 @@
-*~
+o*~
 _*
 *.o
 *.d
@@ -17,7 +17,7 @@ user/usys.S
 .gdbinit
 gdb_virt64.resc
 .gdb_history
-log_file
+log_file*
 
 # Ignore vim files:
 *~
