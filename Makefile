@@ -157,7 +157,8 @@ clean:
 	$(UPROGS)
 
 # try to generate a unique GDB port
-GDBPORT = $(shell expr `id -u` % 5000 + 25000)
+GDBPORT = $(shell expr `id -u` % 5000 + 20000)
+GDBPORT_DELTA = $(shell expr `id -u` % 5000)
 # QEMU's gdb stub command line changed in 0.11
 QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
 	then echo "-gdb tcp::$(GDBPORT)"; \
@@ -176,7 +177,7 @@ RENODEOPTS += --console
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
 
 gdb_$(RESC): $(RESC)
-	sed 's/#machine StartGdbServer [[:digit:]]\+/machine StartGdbServer $(GDBPORT)/' < $^ > $@
+	sed -r 's/#machine StartGdbServer ([[:digit:]])[[:digit:]]+/machine StartGdbServer \1$(GDBPORT_DELTA)/' < $^ > $@
 
 qemu: $K/kernel fs.img
 	$(QEMU) $(QEMUOPTS)

@@ -5,20 +5,25 @@ $name?="virt"
 mach create $name
 machine LoadPlatformDescription @riscv64_virt.repl
 #machine EnableProfiler '../../msys64/home/Malek/git/xv6-on-hardware/profiler'
-#machine StartGdbServer 26000 true
+#machine StartGdbServer 20000 false sysbus.cpu
+#machine StartGdbServer 30000 false sysbus.u54_1
 
 $bin?=@kernel/kernel
 
-#logFile @log_file
+logFile @log_file
 
 showAnalyzer sysbus.uart0
-# sysbus.cpu LogFunctionNames true
+sysbus.cpu LogFunctionNames true
+sysbus.u54_1 LogFunctionNames true
 sysbus LogAllPeripheralsAccess true
 #logLevel -1 file sysbus.uart0
 #logLevel -1 file sysbus.virtio
 #logLevel -1 file sysbus.cpu
-#logLevel -1 file sysbus
+logLevel -1 file sysbus
 #logLevel -1 file cpu
+
+#sysbus.cpu ExecutionMode SingleStepBlocking
+#sysbus.u54_1 ExecutionMode SingleStepBlocking
 
 macro reset 
 """
